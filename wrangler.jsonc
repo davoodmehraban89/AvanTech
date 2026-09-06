@@ -1,8 +1,10 @@
 {
   "name": "avantech",
+  "main": ".open-next/worker.js",
   "compatibility_date": "2026-09-04",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "pages_build_output_dir": ".open-next"
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  }
 }
