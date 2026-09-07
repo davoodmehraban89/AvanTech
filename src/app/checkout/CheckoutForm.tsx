@@ -1,26 +1,22 @@
 'use client';
-
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cart';
-
-export default function CheckoutForm({ userId }: { userId: string }) {
-  const router = useRouter();
-  const items = useCartStore((s) => s.items);
-  const clear = useCartStore((s) => s.clear);
-  const total = useCartStore((s) => s.total());
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
+export default function CheckoutForm() {
+  const items = useCartStore(s => s.items);
+  const total = useCartStore(s => s.total());
   const [message, setMessage] = useState('');
-
+  const [submitting, setSubmitting] = useState(false);
   async function submitOrder() {
-    const res = await fetch('/api/orders', { method: 'POST', body: JSON.stringify({ userId, address, phone, items, total }) });
-    if (res.ok) {
-      clear();
-      setMessage('سفارش با موفقیت ثبت شد');
-      router.push('/profile');
-    }
+    if (submitting) return;
+    setMessage('');
+    if (!items.length) { setMessage('سبد خرید خالی است.'); return; }
+    setSubmitting(true);
+    try {
+      // Do not send user identity, PII, or client totals to unfinished checkout.
+      const res = await fetch('/api/orders', { method: 'POST', signal: AbortSignal.timeout(10000) });
+      setMessage(res.ok ? 'پاسخ نیازمند بررسی است؛ تا دریافت شناسه سفارش معتبر، سبد حفظ می‌شود.' : 'ثبت سفارش فعلاً فعال نیست. سبد شما حفظ شده و پرداختی انجام نشده است.');
+    } catch { setMessage('ارتباط با سرور برقرار نشد. سبد شما حفظ شده است؛ دوباره تلاش کنید.'); }
+    finally { setSubmitting(false); }
   }
-
-  return <div className="space-y-3"><input className="w-full rounded border p-3" value={address} onChange={(e)=>setAddress(e.target.value)} placeholder="آدرس ارسال"/><input className="w-full rounded border p-3" value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="شماره تماس"/><div>مبلغ کل: {total}</div><button onClick={submitOrder} className="rounded bg-black px-5 py-3 text-white">ثبت نهایی سفارش</button><p>{message}</p></div>;
+  return <div className="space-y-3"><p>ثبت سفارش مالی و پرداخت تا تکمیل اتصال امن فعال نمی‌شود. فعلاً نیازی به وارد کردن اطلاعات تماس و آدرس نیست.</p><div>جمع نمایشی سبد: {Number.isFinite(total) ? total.toLocaleString('fa-IR') : 'قیمت نیازمند بررسی است'}</div><button disabled={submitting || !items.length} onClick={submitOrder} className="rounded bg-black px-5 py-3 text-white">{submitting ? 'در حال بررسی…' : 'بررسی امکان ثبت سفارش'}</button><p role="status" aria-live="polite">{message}</p></div>;
 }
