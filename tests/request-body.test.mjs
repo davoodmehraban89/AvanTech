@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readJsonBody} from '../src/domain/request-body.ts';
+const req=(body,headers={'content-type':'application/json'})=>new Request('https://store.example/api/orders',{method:'POST',headers,body});
+test('reads JSON with explicit media type',async()=>assert.deepEqual(await readJsonBody(req('{"x":1}')),{x:1}));
+test('rejects missing media type',async()=>assert.rejects(()=>readJsonBody(req('{}',{})),/UNSUPPORTED_MEDIA_TYPE/));
+test('rejects corrupt JSON',async()=>assert.rejects(()=>readJsonBody(req('{broken'))));
+test('enforces actual size despite false length',async()=>assert.rejects(()=>readJsonBody(req('123456789',{'content-type':'application/json','content-length':'1'}),8),/BODY_TOO_LARGE/));
+test('counts UTF-8 bytes',async()=>assert.rejects(()=>readJsonBody(req('"سلام"'),8),/BODY_TOO_LARGE/));
+test('accepts exact limit',async()=>assert.deepEqual(await readJsonBody(req('{}'),2),{}));
