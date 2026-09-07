@@ -1,13 +1,59 @@
 'use client';
+
 import { create } from 'zustand';
 
-type CartItem = { id:string; name:string; price:number; image?:string; quantity:number };
+type CartItem = {
+  id: string;
+  name: string;
+  price: number;
+  image?: string;
+  quantity: number;
+};
 
-type CartState = { items: CartItem[]; add:(item:CartItem)=>void; remove:(id:string)=>void; count:()=>number };
+type CartState = {
+  items: CartItem[];
+  add: (item: CartItem) => void;
+  remove: (id: string) => void;
+  clear: () => void;
+  count: () => number;
+  total: () => number;
+};
 
-export const useCartStore = create<CartState>((set,get)=>({
- items:[],
- add:(item)=>set(s=>{const old=s.items.find(x=>x.id===item.id);return {items:old?s.items.map(x=>x.id===item.id?{...x,quantity:x.quantity+1}:x):[...s.items,item]}}),
- remove:(id)=>set(s=>({items:s.items.filter(x=>x.id!==id)})),
- count:()=>get().items.reduce((a,b)=>a+b.quantity,0)
+export const useCartStore = create<CartState>((set, get) => ({
+  items: [],
+
+  add: (item: CartItem): void =>
+    set((state: CartState) => {
+      const existing = state.items.find((product: CartItem) => product.id === item.id);
+
+      if (existing) {
+        return {
+          items: state.items.map((product: CartItem) =>
+            product.id === item.id
+              ? { ...product, quantity: product.quantity + 1 }
+              : product
+          ),
+        };
+      }
+
+      return {
+        items: [...state.items, item],
+      };
+    }),
+
+  remove: (id: string): void =>
+    set((state: CartState) => ({
+      items: state.items.filter((item: CartItem) => item.id !== id),
+    })),
+
+  clear: (): void => set({ items: [] }),
+
+  count: (): number =>
+    get().items.reduce((total: number, item: CartItem) => total + item.quantity, 0),
+
+  total: (): number =>
+    get().items.reduce(
+      (total: number, item: CartItem) => total + item.price * item.quantity,
+      0
+    ),
 }));
