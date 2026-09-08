@@ -1,9 +1,2 @@
-export default function Footer() {
-  return (
-    <footer className="border-t bg-gray-50">
-      <div className="mx-auto max-w-7xl p-6 text-center text-sm">
-        © AvanTech - فروشگاه فناوری
-      </div>
-    </footer>
-  );
-}
+import Link from 'next/link';
+export default function Footer(){return <footer className="site-footer" id="about"><div><span className="wordmark">AvanTech</span><p>برای کارهای بزرگ. برای لحظه‌های خودت.</p></div><div><Link href="/#collection">کشف محصولات</Link><Link href="/login">حساب کاربری</Link><a href="#top">بازگشت به بالا ↑</a></div><small>آون‌تک · فناوری و گیمینگ<br/>نسخه در حال توسعه؛ خرید آنلاین هنوز آماده نیست.</small></footer>}
