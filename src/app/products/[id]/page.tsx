@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProductDetails } from '@/services/products';
 import './product-detail.css';
+import ProductPresentation from './ProductPresentation';
 
 export default async function ProductPage({params}:{params:Promise<{id:string}>}) {
  const {id}=await params;
@@ -12,7 +13,7 @@ export default async function ProductPage({params}:{params:Promise<{id:string}>}
  if(!product) notFound();
  return <main className="detail-shell">
  <nav className="detail-breadcrumb" aria-label="مسیر صفحه"><Link href="/">خانه</Link><span>/</span><Link href="/#collection">محصولات</Link><span>/</span><span>{product.name}</span></nav>
- <div className="detail-layout"><section className="detail-visual" aria-label="تصویر محصول"><span aria-hidden="true">AV.</span><p>تصویر تأییدشده محصول به‌زودی اضافه می‌شود</p></section>
+ <div className="detail-layout"><ProductPresentation name={product.name} media={product.product_media ?? []} variants={product.product_variants ?? []} />
  <section className="detail-copy"><p className="detail-eyebrow">AVANTECH / COLLECTION</p><h1>{product.name}</h1><span className="detail-badge">اطلاعات در حال تکمیل</span><p className="detail-description">{product.description || 'مشخصات و توضیحات این محصول هنوز تکمیل نشده است.'}</p>
  <div className="detail-purchase"><h2>قیمت و موجودی در حال بررسی</h2><p>تا تأیید گونه محصول، قیمت و موجودی، امکان افزودن به سبد و ثبت سفارش فعال نیست.</p><button type="button" disabled>خرید هنوز فعال نشده</button><Link href="/#collection">مشاهده محصولات دیگر ←</Link></div>
  <div className="detail-facts"><div><strong>قیمت شفاف</strong><p>مبلغ نهایی پس از تکمیل اطلاعات نمایش داده می‌شود.</p></div><div><strong>مشخصات دقیق</strong><p>رنگ، ظرفیت و شرایط هر گونه باید پیش از خرید مشخص شود.</p></div></div></section></div>
