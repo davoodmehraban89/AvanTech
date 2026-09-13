@@ -1,19 +1,2 @@
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import CheckoutForm from './CheckoutForm';
-
-export default async function CheckoutPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) redirect('/login');
-
-  return (
-    <main className="mx-auto max-w-3xl p-4">
-      <div className="rounded-xl border p-6 space-y-4">
-        <h1 className="text-2xl font-bold">تسویه حساب</h1>
-        <CheckoutForm userId={user.id} />
-      </div>
-    </main>
-  );
-}
+import Link from 'next/link';
+export default function CheckoutPage(){return <main className="storefront"><section className="catalog-state" style={{margin:'35px 0 70px',padding:40}}><p className="kicker">CHECKOUT / COMING NEXT</p><h1>ثبت سفارش هنوز فعال نیست.</h1><p style={{margin:'20px 0'}}>پیش از فعال‌شدن خرید، قیمت، موجودی و پرداخت باید به‌صورت یکپارچه بررسی شوند. در این صفحه اطلاعات تماس یا پرداخت دریافت نمی‌شود.</p><Link className="primary-action" href="/products">بازگشت به محصولات ←</Link></section></main>;}
